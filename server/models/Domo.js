@@ -19,6 +19,11 @@ const DomoSchema = new mongoose.Schema({
     min: 0,
     required: true,
   },
+  squirrelsOwned: {
+    type: Number,
+    min: 0,
+    required: true,
+  },
   owner: {
     type: mongoose.Schema.ObjectId,
     required: true,
@@ -33,14 +38,24 @@ const DomoSchema = new mongoose.Schema({
 DomoSchema.statics.toAPI = (doc) => ({
   name: doc.name,
   age: doc.age,
+  squirrelsOwned: doc.squirrelsOwned,
 });
 
 DomoSchema.statics.findByOwner = (ownerID, callback) => {
   const search = {
     owner: convertId(ownerID),
   };
-  return DomoModel.find(search).select('name age').exec(callback);
+  return DomoModel.find(search).select('name age squirrelsOwned').exec(callback);
 };
+
+DomoSchema.statics.deleteByName = (ownerID, name) => {
+  const search = {
+    owner: convertId(ownerID),
+    name,
+  };
+  return DomoModel.deleteOne(search);
+};
+
 DomoModel = mongoose.model('Domo', DomoSchema);
 
 module.exports.DomoModel = DomoModel;
